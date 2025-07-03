@@ -1,47 +1,51 @@
-import pygame
+import pygame 
+import time
 pygame.init()
-Width=1000
-global win
-size_x=20
-size_y=20
-Height=600
-sx=Width/2
-sy=Height/2
-class Start_game:
-    def __init__(self,width,height):
-        self.width=width
-        self.height=height
-    def screen_feature(self):
-        win=pygame.display.set_mode((self.width,self.height))
-        pygame.display.set_caption("snake game")
-        return win
-class snake:
-    def __init__(self,sx,sy,size_x,size_y):
-        self.sx=sx
-        self.sy=sy
-        self.szx=size_x
-        self.szy=size_y
-class inheritsnake(Start_game,snake):
-    def __init__(self,width,height,sx,sy,size_x,size_y):
-        Start_game.__init__(self,width,height)
-        snake.__init__(self,sx,sy,size_x,size_y)
-    def drawsnake(self):
-        c=Start_game(Width,Height)
-        win=c.screen_feature()
-        s=snake(sx,sy,size_x,size_y)
-        pygame.draw.rect(win, 'red', (int(s.sx), int(s.sy), int(s.szx), int(s.szy)))
-
+width=1000
+height=700
+win=pygame.display.set_mode((width,height))
+pygame.display.set_caption("snake game")
+c=pygame.time.Clock()
 def gameloop():
-    run=True
-    sarp=inheritsnake(Width,Height,sx,sy,size_x,size_y)
-    sg=Start_game(Width,Height)
-    win=sg.screen_feature()
-    while run:
-        sg.screen_feature()
+    sx=int(width/2)
+    sy=int(height/2)
+    zx=20
+    zy=20
+    class snake:
+        def __init__(self,sx,sy,zx,zy,surface):
+            self.sx=sx
+            self.surface=surface
+            self.sy=sy
+            self.zx=zx
+            self.zy=zy
+        def draw_snake(self,surface,sx,sy,zx,zy):
+            pygame.draw.rect(surface,'red',(sx,sy,zx,zy))
+    Stop=False
+    speed=0
+    speedy=0
+    run=False
+    s=snake(sx,sy,zx,zy,win)
+    while  not Stop:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
-                run=False
+                Stop=True
+            if event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_RIGHT:
+                    speed+=10
+                    speedy=0
+                elif event.key==pygame.K_LEFT:
+                   speed-=10
+                   speedy=0
+                elif event.key==pygame.K_UP:
+                    speedy-=10
+                    speed=0
+                else:
+                    speed=0
+                    speedy+=10
         win.fill('black')
-        sarp.drawsnake()
+        sx+=speed
+        sy+=speedy
+        s.draw_snake(win,sx,sy,zx,zy)
+        c.tick(50)
         pygame.display.update()
 gameloop()
