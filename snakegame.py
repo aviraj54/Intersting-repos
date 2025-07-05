@@ -5,7 +5,8 @@ import math
 pygame.init()
 head=[]
 width=1000
-height=700
+score=0
+height=640
 win=pygame.display.set_mode((width,height))
 pygame.display.set_caption("snake game")
 c=pygame.time.Clock()
@@ -14,6 +15,8 @@ fy=random.randrange(0,height)
 length=1
 def gameloop():
     sx=int(width/2)
+    a=[]
+    show=False
     sy=int(height/2)
     zx=20
     zy=20
@@ -42,11 +45,17 @@ def gameloop():
             pygame.draw.rect(surface,'green',(fx,fy,zx,zy))
     f=food(fx,fy,zx,zy,win)
     def detect_collision():
-        global length
+        global length,score
         if ((sx-f.fx)**2+(sy-f.fy)**2)<=144:
             f.fx=random.randrange(0,width)
             f.fy=random.randrange(0,height)
+            score+=1
             length+=1
+    def showfont(color):
+        global score
+        font=pygame.font.SysFont('arial',30)
+        display=font.render(f'score:{score}',True,color)
+        win.blit(display,(width/2,30))
     while  not Stop:
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -78,11 +87,20 @@ def gameloop():
         head.append((sx,sy))
         if len(head)>length:
             head.pop(0)
-        print(head)
         for x,y in head:
             s.draw_snake(win,x,y,zx,zy)
+        for i in range(1,length):
+            if length>1:
+                if head[i]==head[0]:
+                    show=True
+            
+        if show:
+            win.fill('blue')
+            f.fx=-100
+            
         f.draw_food(win,f.fx,f.fy,zx,zy)
         detect_collision()
+        showfont('green')
         c.tick(50)
         pygame.display.update()
 gameloop()
