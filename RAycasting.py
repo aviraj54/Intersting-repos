@@ -1,9 +1,20 @@
 import pygame
+import math
 pygame.init()
 width,height=1000,500
 win=pygame.display.set_mode((width,height))
 def gameloop():
+    semihalf=math.radians(120)
     global win
+    px,py=width/4,height/2
+    player_angle=math.radians(90)
+    def castrays():
+        for rays in range(60):
+            tx=px+math.cos(math.radians(120-rays*1))*200
+            ty=px-math.sin(math.radians(120-rays*1))*200
+
+            pygame.draw.line(win,'red',(px,py),(tx,ty))
+            
     def draw_map():
         global win
         map_size=5
@@ -30,6 +41,11 @@ def gameloop():
                 run=False
         win.fill('black')
         draw_map()
+        pygame.draw.circle(win,'red',(width/4,height/2),10)
+        pygame.draw.line(win,'red',(px,py),(px+math.cos(player_angle)*200,py-math.sin(player_angle)*200))
+        pygame.draw.line(win,'pink',(px,py),(px+math.cos(math.radians(60))*2000,py-math.sin(math.radians(60))*2000))
+        pygame.draw.line(win,'yellow',(px,py),(px+math.cos(math.radians(120))*2000,py-math.sin(math.radians(120))*2000))
+        castrays()
         pygame.display.update()
     pygame.quit()
     
