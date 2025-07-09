@@ -1,20 +1,25 @@
 import pygame
 import math
+import time
 pygame.init()
 width,height=1000,500
 win=pygame.display.set_mode((width,height))
 def gameloop():
+    c=pygame.time.Clock()
+    f=width/4
+    g=height/2
+    speed=0
     semihalf=math.radians(120)
     global win
     px,py=width/4,height/2
     player_angle=math.radians(90)
     def castrays():
-        for rays in range(60):
-            tx=px+math.cos(math.radians(120-rays*1))*200
-            ty=px-math.sin(math.radians(120-rays*1))*200
-
-            pygame.draw.line(win,'red',(px,py),(tx,ty))
-            
+        for rays in range(120):
+            for depth in range(height):
+                tx=px+math.cos(math.radians(player_angle+30-rays*1/2))*depth
+                ty=px-math.sin(math.radians(player_angle+30-rays*1/2))*depth
+                pygame.draw.line(win,'red',(px,py),(tx,ty))
+                
     def draw_map():
         global win
         map_size=5
@@ -36,16 +41,24 @@ def gameloop():
         print(x)      
     run=True
     while run:
+        global k
+        k=pygame.key.get_pressed()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 run=False
         win.fill('black')
         draw_map()
-        pygame.draw.circle(win,'red',(width/4,height/2),10)
-        pygame.draw.line(win,'red',(px,py),(px+math.cos(player_angle)*200,py-math.sin(player_angle)*200))
-        pygame.draw.line(win,'pink',(px,py),(px+math.cos(math.radians(60))*2000,py-math.sin(math.radians(60))*2000))
-        pygame.draw.line(win,'yellow',(px,py),(px+math.cos(math.radians(120))*2000,py-math.sin(math.radians(120))*2000))
         castrays()
+        if k[pygame.K_UP]:
+            py-=2
+        if k[pygame.K_DOWN]:
+            py+=2
+        if k[pygame.K_RIGHT]:
+            player_angle-=2
+        if k[pygame.K_LEFT]:
+            player_angle+=2
+        pygame.draw.circle(win,'red',(px,py),10)
+        c.tick(20)
         pygame.display.update()
     pygame.quit()
     
