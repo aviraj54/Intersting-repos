@@ -13,11 +13,11 @@ def gameloop():
     global win
     px,py=width/4,height/2
     player_angle=math.radians(90)
-    def castrays():
+    def castrays(px,py,player_angle):
         for rays in range(120):
-            for depth in range(height):
+            for depth in range(0,height,5):
                 tx=px+math.cos(math.radians(player_angle+30-rays*1/2))*depth
-                ty=px-math.sin(math.radians(player_angle+30-rays*1/2))*depth
+                ty=py-math.sin(math.radians(player_angle+30-rays*1/2))*depth
                 pygame.draw.line(win,'red',(px,py),(tx,ty))
                 
     def draw_map():
@@ -48,17 +48,20 @@ def gameloop():
                 run=False
         win.fill('black')
         draw_map()
-        castrays()
-        if k[pygame.K_UP]:
-            py-=2
-        if k[pygame.K_DOWN]:
-            py+=2
+        if player_angle>0 and player_angle<90:
+            if k[pygame.K_UP]:
+                px+=2
+                py-=2
+            elif k[pygame.K_DOWN]:
+                px-=2
+                py+=2
         if k[pygame.K_RIGHT]:
             player_angle-=2
         if k[pygame.K_LEFT]:
             player_angle+=2
         pygame.draw.circle(win,'red',(px,py),10)
-        c.tick(20)
+        castrays(px,py,player_angle)
+        c.tick(200)
         pygame.display.update()
     pygame.quit()
     
