@@ -1,69 +1,86 @@
 import pygame
 import math
-import time
-pygame.init()
-width,height=1000,500
-win=pygame.display.set_mode((width,height))
-def gameloop():
-    c=pygame.time.Clock()
-    f=width/4
-    g=height/2
-    speed=0
-    semihalf=math.radians(120)
-    global win
-    px,py=width/4,height/2
-    player_angle=math.radians(90)
-    def castrays(px,py,player_angle):
-        for rays in range(120):
-            for depth in range(0,height,5):
-                tx=px+math.cos(math.radians(player_angle+30-rays*1/2))*depth
-                ty=py-math.sin(math.radians(player_angle+30-rays*1/2))*depth
-                pygame.draw.line(win,'red',(px,py),(tx,ty))
-                
-    def draw_map():
-        global win
-        map_size=5
-        map_width=width/2
-        Map=['0','#','#','#','#',
-             '#','#','0','#','#',
-             '#','#','0','#','#',
-             '#','#','#','#','#',
-             '#','#','#','#','#']
-        for col in range(map_size):
-            for row in range(map_size):
-                x=col*map_size+row
-                if Map[x]=="#":
-                    pygame.draw.rect(win,'green',((row*100),col*100,100-2,100-2))
-                else:
-                     pygame.draw.rect(win,'white',((row*100),col*100,100-2,100-2)) 
 
-    def new_func(x):
-        print(x)      
-    run=True
-    while run:
-        global k
-        k=pygame.key.get_pressed()
-        for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                run=False
-        win.fill('black')
-        draw_map()
-        if player_angle>0 and player_angle<90:
-            if k[pygame.K_UP]:
-                px+=2
-                py-=2
-            elif k[pygame.K_DOWN]:
-                px-=2
-                py+=2
-        if k[pygame.K_RIGHT]:
-            player_angle-=2
-        if k[pygame.K_LEFT]:
-            player_angle+=2
-        pygame.draw.circle(win,'red',(px,py),10)
-        castrays(px,py,player_angle)
-        c.tick(200)
-        pygame.display.update()
-    pygame.quit()
-    
-    
-gameloop()
+pygame.init()
+w, h = 800, 600
+screen = pygame.display.set_mode((w, h))
+clock = pygame.time.Clock()
+
+map_ = [
+    "########",
+    "#......#",
+    "#.##...#",
+    "#......#",
+    "###.####",
+    "#......#",
+    "########"
+]
+map_w, map_h = len(map_[0]), len(map_)
+
+block = 64
+fov = math.pi / 3
+num_rays = 120
+max_depth = block * 8
+half_h = h // 2
+scale = w // num_rays
+
+player_x, player_y = block + block//2, block + block//2
+player_angle = 0
+speed = 3
+
+def cast_ray(px, py, angle):
+    sin_a = math.sin(angle)
+    cos_a = math.cos(angle)
+
+    for depth in range(0, max_depth, 5):
+        x = px + depth * cos_a
+        y = py + depth * sin_a
+
+        map_x = int(x // block)
+        map_y = int(y // block)
+
+        if 0 <= map_x < map_w and 0 <= map_y < map_h:
+            if map_[map_y][map_x] == '#':
+                return depth, x, y
+    return max_depth, x, y
+
+run = True
+while run:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player_angle -= 0.04
+    if keys[pygame.K_RIGHT]:
+        player_angle += 0.04
+    if keys[pygame.K_UP]:
+        nx = player_x + speed * math.cos(player_angle)
+        ny = player_y + speed * math.sin(player_angle)
+        if map_[int(ny // block)][int(nx // block)] == '.':
+            player_x, player_y = nx, ny
+    if keys[pygame.K_DOWN]:
+        nx = player_x - speed * math.cos(player_angle)
+        ny = player_y - speed * math.sin(player_angle)
+        if map_[int(ny // block)][int(nx // block)] == '.':
+            player_x, player_y = nx, ny
+
+    screen.fill((0, 0, 0))
+
+    start_angle = player_angle - fov / 2
+    for ray in range(num_rays):
+        angle = start_angle + ray * fov / num_rays
+        depth, hit_x, hit_y = cast_ray(player_x, player_y, angle)
+        depth *= math.cos(player_angle - angle)  # fishbowl fix
+        if depth == 0:
+            depth = 0.0001
+        h_line = 21000 / depth
+        color = 255 / (1 + depth * depth * 0.0001)
+        pygame.draw.rect(screen, (color, color, color),
+                         (ray * scale, half_h - h_line // 2, scale, h_line))
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()
