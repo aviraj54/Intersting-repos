@@ -45,9 +45,8 @@ def collision():
     global bullet_pos
     for bx,by in bullet_pos[:]:
         for ex,ey in arr: 
-            print(ex,ey)
             distance=math.sqrt((bx-ex)**2+(by-ey)**2)
-            if distance<100:
+            if distance<80:
                 arr = arr[~np.all(arr == [ex, ey], axis=1)]
                 bullet_pos.remove((bx,by))
                 break 

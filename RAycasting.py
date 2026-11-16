@@ -1,86 +1,54 @@
-import pygame
+import pygame as pg
+import numpy as np
 import math
-
-pygame.init()
-w, h = 800, 600
-screen = pygame.display.set_mode((w, h))
-clock = pygame.time.Clock()
-
-map_ = [
-    "########",
-    "#......#",
-    "#.##...#",
-    "#......#",
-    "###.####",
-    "#......#",
-    "########"
-]
-map_w, map_h = len(map_[0]), len(map_)
-
-block = 64
-fov = math.pi / 3
-num_rays = 120
-max_depth = block * 8
-half_h = h // 2
-scale = w // num_rays
-
-player_x, player_y = block + block//2, block + block//2
-player_angle = 0
-speed = 3
-
-def cast_ray(px, py, angle):
-    sin_a = math.sin(angle)
-    cos_a = math.cos(angle)
-
-    for depth in range(0, max_depth, 5):
-        x = px + depth * cos_a
-        y = py + depth * sin_a
-
-        map_x = int(x // block)
-        map_y = int(y // block)
-
-        if 0 <= map_x < map_w and 0 <= map_y < map_h:
-            if map_[map_y][map_x] == '#':
-                return depth, x, y
-    return max_depth, x, y
-
-run = True
+pg.init()
+width=1000
+height=500
+px=width/4
+py=height/2
+clock=pg.time.Clock()
+casted_rays=60//2
+pov=60
+target_x=270
+target_y=270
+win=pg.display.set_mode((width,height))
+mapp=np.array([[0,0,0,0,0],
+              [0,0,0,1,0],
+              [0,0,0,0,0],
+              [0,0,1,0,0],
+              [0,0,1,0,0]])
+run=True
+def draw_map():
+    for rows in range(len(mapp)):
+        for cols in range(len(mapp[rows])):
+            if mapp[rows][cols]==1:
+                pg.draw.rect(win,'red',(cols*100,rows*100,100-1,100-1))
+            if mapp[rows][cols]==0:
+                pg.draw.rect(win,'white',(cols*100,rows*100,100-1,100-1))
 while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
-        player_angle -= 0.04
-    if keys[pygame.K_RIGHT]:
-        player_angle += 0.04
-    if keys[pygame.K_UP]:
-        nx = player_x + speed * math.cos(player_angle)
-        ny = player_y + speed * math.sin(player_angle)
-        if map_[int(ny // block)][int(nx // block)] == '.':
-            player_x, player_y = nx, ny
-    if keys[pygame.K_DOWN]:
-        nx = player_x - speed * math.cos(player_angle)
-        ny = player_y - speed * math.sin(player_angle)
-        if map_[int(ny // block)][int(nx // block)] == '.':
-            player_x, player_y = nx, ny
-
-    screen.fill((0, 0, 0))
-
-    start_angle = player_angle - fov / 2
-    for ray in range(num_rays):
-        angle = start_angle + ray * fov / num_rays
-        depth, hit_x, hit_y = cast_ray(player_x, player_y, angle)
-        depth *= math.cos(player_angle - angle)  # fishbowl fix
-        if depth == 0:
-            depth = 0.0001
-        h_line = 21000 / depth
-        color = 255 / (1 + depth * depth * 0.0001)
-        pygame.draw.rect(screen, (color, color, color),
-                         (ray * scale, half_h - h_line // 2, scale, h_line))
-
-    pygame.display.flip()
+    for event in pg.event.get():
+        if event.type==pg.QUIT:
+            run=False
+    win.fill('black')
+    draw_map()
+    pg.draw.circle(win,'green',(px,py),5)
+    keys=pg.key.get_pressed()
+    if keys[pg.K_LEFT]:
+            target_x-=10
+            target_y-=10
+    if keys[pg.K_RIGHT]:
+            target_x+=10
+            target_y+=10
+    if keys[pg.K_UP]:
+        px += math.cos(math.radians(target_x)) * 5
+        py += math.sin(math.radians(target_y)) * 5
+    if keys[pg.K_DOWN]:
+            px += math.cos(math.radians(target_x+180)) * 5
+            py += math.sin(math.radians(target_y+180)) * 5
+    for i in range(casted_rays):
+        for j in range(pov//2):
+            pg.draw.line(win,'yellow',(px,py),(px+100*math.cos(math.radians(target_x+j)),py+100*math.sin(math.radians(target_y+j))),10)
+            pg.draw.line(win,'yellow',(px,py),(px+100*math.cos(math.radians(target_x-j)),py+100*math.sin(math.radians(target_y-j))),10)
     clock.tick(60)
-
-pygame.quit()
+    pg.display.update()
+            
