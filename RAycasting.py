@@ -47,8 +47,19 @@ while run:
             py += math.sin(math.radians(target_y+180)) * 5
     for i in range(casted_rays):
         for j in range(pov//2):
-            pg.draw.line(win,'yellow',(px,py),(px+100*math.cos(math.radians(target_x+j)),py+100*math.sin(math.radians(target_y+j))),10)
-            pg.draw.line(win,'yellow',(px,py),(px+100*math.cos(math.radians(target_x-j)),py+100*math.sin(math.radians(target_y-j))),10)
+            pg.draw.line(win,'blue',(px,py),(px+250*math.cos(math.radians(target_x+j)),py+250*math.sin(math.radians(target_y+j))),10)
+            pg.draw.line(win,'blue',(px,py),(px+250*math.cos(math.radians(target_x-j)),py+250*math.sin(math.radians(target_y-j))),10)
+    end_x=px+250*math.cos(math.radians(target_x))
+    end_y=py+250*math.sin(math.radians(target_y))
+    if end_x%10==0 and end_y%10==0:
+        r=int(end_x//100 -1)
+        c=int(end_y//100 -1)
+    else:
+        r=int(end_x//100)
+        c=int(end_y//100)
+    print(c,r)
+    if mapp[c][r]==1:
+        pg.draw.rect(win,'yellow',(r*100,c*100,100-1,100-1))
     clock.tick(60)
     pg.display.update()
             
