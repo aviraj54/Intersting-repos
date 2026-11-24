@@ -8,6 +8,7 @@ height=500
 px=width/4
 step=0
 py=height/2
+multiple=250
 y=0
 b=0
 clock=pg.time.Clock()
@@ -16,11 +17,11 @@ pov=60
 target_x=270-30
 target_y=270-30
 win=pg.display.set_mode((width,height))
-mapp=np.array([[0,0,0,0,0],
-              [0,0,0,1,0],
-              [0,0,0,0,0],
-              [0,0,1,0,0],
-              [0,0,1,0,0]])
+mapp=np.array([[1,1,0,0,1],
+              [1,0,1,1,1],
+              [1,0,0,0,1],
+              [1,0,1,0,1],
+              [1,1,1,1,1]])
 run=True
 def draw_map():
     for rows in range(len(mapp)):
@@ -49,29 +50,21 @@ while run:
     if keys[pg.K_DOWN]:
             px += math.cos(math.radians(target_x+180)) * 5
             py += math.sin(math.radians(target_y+180)) * 5
-    for i in range(casted_rays):
-        for j in range(pov):
-            end_x=px+250*math.cos(math.radians(target_x+j))
-            end_y=py+250*math.sin(math.radians(target_y+j))
-            m=(end_y-py)/(end_x-px) if (end_x-px)!=0 else 0
-            b=(py)-m*(px)
-            pg.draw.line(win,'blue',(px,py),(end_x,end_y),10)
-            if end_x>px:
-                step=10
+    for i in range(60):
+        for depth in range(250):
+            end_x=px+math.cos(math.radians(target_x+i))*depth
+            end_y=py+math.sin(math.radians(target_y+i))*depth
+            if end_x%10==0 and end_y%10==0:
+                 r=int(end_x//100 -1)
+                 c=int(end_y//100 -1)
             else:
-                step=-10
-            for i in range(int(px), int(end_x), step):
-                y=m*i+b
-                if i%10==0 and y%10==0:
-                    r=int(i//100 -1)
-                    c=int(y//100 -1)
-                else:
-                    r=int(i//100)
-                    c=int(y//100)
-                print(c,r)
-                if c<5 and r<5:
-                    if mapp[c][r]==1:
-                        pg.draw.rect(win,'yellow',(r*100,c*100,100-1,100-1))
+                r=int(end_x//100)
+                c=int(end_y//100)
+            if c<5 and r<5:
+                if mapp[c][r]==1:
+                    pg.draw.rect(win,'purple',(r*100,c*100,100-1,100-1))
+                    pg.draw.line(win,'black',(px,py),(end_x,end_y))
+                    break
     clock.tick(60)
     pg.display.update()
             
