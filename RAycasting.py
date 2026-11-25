@@ -17,10 +17,10 @@ pov=60
 target_x=270-30
 target_y=270-30
 win=pg.display.set_mode((width,height))
-mapp=np.array([[1,1,0,0,1],
-              [1,0,1,1,1],
-              [1,0,0,0,1],
-              [1,0,1,0,1],
+mapp=np.array([[1,1,1,1,1],
+              [0,0,0,0,0],
+              [1,1,0,1,1],
+              [1,1,0,1,1],
               [1,1,1,1,1]])
 run=True
 def draw_map():
@@ -39,19 +39,29 @@ while run:
     pg.draw.circle(win,'green',(px,py),5)
     keys=pg.key.get_pressed()
     if keys[pg.K_LEFT]:
-            target_x-=10
-            target_y-=10
+            target_x-=1
+            target_y-=1
     if keys[pg.K_RIGHT]:
-            target_x+=10
-            target_y+=10
+            target_x+=1
+            target_y+=1
     if keys[pg.K_UP]:
-        px += math.cos(math.radians(target_x)) * 5
-        py += math.sin(math.radians(target_y)) * 5
+        px += math.cos(math.radians(target_x)) * 2
+        py += math.sin(math.radians(target_y)) * 2
     if keys[pg.K_DOWN]:
-            px += math.cos(math.radians(target_x+180)) * 5
-            py += math.sin(math.radians(target_y+180)) * 5
+            px += math.cos(math.radians(target_x+180)) * 2
+            py += math.sin(math.radians(target_y+180)) * 2
+    if mapp[int(py//100)][int(px//100)]==1:
+        if keys[pg.K_UP]:
+            px -= math.cos(math.radians(target_x)) * 2
+            py -= math.sin(math.radians(target_y)) * 2
+        if keys[pg.K_DOWN]:
+            px -= math.cos(math.radians(target_x+180)) * 2
+            py -= math.sin(math.radians(target_y+180)) * 2
     for i in range(60):
-        for depth in range(250):
+        for depth in range(500):
+            if depth==0:
+                depth+=1
+            wall_height=40000/depth 
             end_x=px+math.cos(math.radians(target_x+i))*depth
             end_y=py+math.sin(math.radians(target_y+i))*depth
             if end_x%10==0 and end_y%10==0:
@@ -60,11 +70,11 @@ while run:
             else:
                 r=int(end_x//100)
                 c=int(end_y//100)
-            if c<5 and r<5:
-                if mapp[c][r]==1:
-                    pg.draw.rect(win,'purple',(r*100,c*100,100-1,100-1))
-                    pg.draw.line(win,'black',(px,py),(end_x,end_y))
-                    break
+            if mapp[c][r]==1:
+                pg.draw.rect(win,'purple',(r*100,c*100,100-1,100-1))
+                pg.draw.line(win,'black',(px,py),(end_x,end_y))
+                pg.draw.rect(win,'brown',(500+i*10,(height-wall_height)/2,10,wall_height))
+                break
     clock.tick(60)
     pg.display.update()
             
