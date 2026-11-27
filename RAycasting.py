@@ -50,18 +50,18 @@ while run:
             target_x+=3
             target_y+=3
     if keys[pg.K_UP]:
-        px += math.cos(math.radians(target_x)) * 3
-        py += math.sin(math.radians(target_y)) * 3
+        px += math.cos(math.radians(target_x)) * 5
+        py += math.sin(math.radians(target_y)) * 5
     if keys[pg.K_DOWN]:
-            px += math.cos(math.radians(target_x+180)) * 3
-            py += math.sin(math.radians(target_y+180)) * 3
+            px += math.cos(math.radians(target_x+180)) * 5
+            py += math.sin(math.radians(target_y+180)) * 5
     if mapp[int(py//100)][int(px//100)]==1:
         if keys[pg.K_UP]:
-            px -= math.cos(math.radians(target_x)) * 3
-            py -= math.sin(math.radians(target_y)) * 3
+            px -= math.cos(math.radians(target_x)) * 5
+            py -= math.sin(math.radians(target_y)) * 5
         if keys[pg.K_DOWN]:
-            px -= math.cos(math.radians(target_x+180)) * 3
-            py -= math.sin(math.radians(target_y+180)) * 3
+            px -= math.cos(math.radians(target_x+180)) * 5
+            py -= math.sin(math.radians(target_y+180)) * 5
     for n in range(rays):
         i = -30 + n*(60/rays)             # spans -30 to +30, i=0 is the center ray
         for depth in range(800):          # CHANGED: longer rays for the bigger map
@@ -80,7 +80,6 @@ while run:
                 break
             if mapp[c][r]==1:
                 pg.draw.rect(win,'purple',(r*100,c*100,100-1,100-1))
-                pg.draw.line(win,'black',(px,py),(end_x,end_y),1)
                 pg.draw.rect(win,'brown',(800+n*col_w,(height-wall_height)/2,col_w+1,wall_height))   # CHANGED: 3D view starts at x=800
                 break
     clock.tick(90)

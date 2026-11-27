@@ -1,0 +1,10 @@
+import socket
+server =socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(('0.0.0.0',8080))
+print ("Waiting For players")
+server.listen(5)
+connector,address=server.accept()
+print("player connected!")
+connector.send(b"Welcome to the server!")
+dataum=connector.recv(1024)
+print(dataum.decode())
