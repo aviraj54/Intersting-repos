@@ -6,5 +6,8 @@ server.listen(5)
 connector,address=server.accept()
 print("player connected!")
 connector.send(b"Welcome to the server!")
-dataum=connector.recv(1024)
-print(dataum.decode())
+while True:
+    dataum=connector.recv(1024)
+    print(dataum.decode())
+    if not dataum:
+        break
